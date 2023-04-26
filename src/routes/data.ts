@@ -7,6 +7,7 @@ const router: express.Router = express.Router();
 
 router.get("/ids", async (req: express.Request, res: express.Response) => {
   const ids = req.body.ids;
+  
   const email = req.body.ids;
   const emailid = req.body.emailid;
 
@@ -15,8 +16,8 @@ router.get("/ids", async (req: express.Request, res: express.Response) => {
     u = u[0];
     let data: any = [];
 
-    data = await Data.find({ FBID: { $in: ids } })
-    if (u.balance > data.length) {
+    data = await Data.find({ $or: [{ FBID: { $in: ids } }, { Phone: { $in: ids } }] });
+         if (u.balance > data.length) {
       await user.updateOne({ email: emailid }, { $inc: { balance: -(data.length) } });
 
     } else {
@@ -51,14 +52,14 @@ router.get("/search", async (req: express.Request, res: express.Response) => {
   interface Filter {
     FBID?: string;
     Phone?: string;
-    first_name?: string;
-    last_name?: string;
+    first_name?: any;
+    last_name?: any;
     email?: string;
     birthday?: string;
     gender?: string;
     locale?: string;
-    hometown?: string;
-    location?: string;
+    hometown?: any;
+    location?: any;
     country?: string;
   }
 
@@ -75,11 +76,12 @@ router.get("/search", async (req: express.Request, res: express.Response) => {
     }
 
     if (first_name) {
-      filter.first_name = first_name;
+      const regex = new RegExp(`^${first_name}`, 'i');
+      filter.first_name = { $regex: regex };
     }
-
     if (last_name) {
-      filter.last_name = last_name;
+      const regex = new RegExp(`^${last_name}`, 'i');
+      filter.last_name = { $regex: regex };
     }
 
     if (email) {
@@ -99,25 +101,27 @@ router.get("/search", async (req: express.Request, res: express.Response) => {
     }
 
     if (hometown) {
-      filter.hometown = hometown;
+      const regex = new RegExp(`^${hometown}`, 'i');
+      filter.hometown = { $regex: regex };
     }
 
     if (location) {
-      filter.location = location;
-    }
+      const regex = new RegExp(`^${location}`, 'i');
+      filter.location = { $regex: regex };    }
 
     if (country) {
       filter.country = country;
     }
     let u: any = await user.find({ email: emailid });
     u = u[0];
-    console.log(u);
+
     let data: any = [];
     if (u.balance < limit) {
       limit = u.balance;
     }
     const updateUser: any = [];
-    data = await Data.find(filter).limit(limit);
+    // data = await Data.find(filter).limit(limit);
+    data = await Data.aggregate([{ $match: filter }, { $sample: { size: limit } }]);
     if (u.balance > data.length) {
       await user.updateOne({ email: emailid }, { $inc: { balance: -(data.length) } });
 

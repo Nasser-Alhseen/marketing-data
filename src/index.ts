@@ -7,7 +7,9 @@ const morgan=require('morgan');
 const logger = morgan('tiny');
 
 const app: express.Application = express();
-mongoose.connect('mongodb+srv://nasser007:nasser007@cluster0.hrdjhpq.mongodb.net/?retryWrites=true&w=majority').then(res=>console.log('connected to mongodb !'))
+// mongoose.connect('mongodb+srv://nasser007:nasser007@cluster0.hrdjhpq.mongodb.net/?retryWrites=true&w=majority').then(res=>console.log('connected to mongodb !'))
+mongoose.connect('mongodb://localhost/datadb').then(res=>console.log('connected to mongodb !'))
+
 app.use(logger);
 app.use(bodyParser.json())
 
