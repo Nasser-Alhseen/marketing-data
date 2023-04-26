@@ -11,8 +11,8 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const morgan = require('morgan');
 const logger = morgan('tiny');
 const app = (0, express_1.default)();
-// mongoose.connect('mongodb+srv://nasser007:nasser007@cluster0.hrdjhpq.mongodb.net/?retryWrites=true&w=majority').then(res=>console.log('connected to mongodb !'))
-mongoose_1.default.connect('mongodb://localhost/datadb').then(res => console.log('connected to mongodb !'));
+mongoose.connect('mongodb+srv://nasser007:nasser007@cluster0.hrdjhpq.mongodb.net/?retryWrites=true&w=majority').then(res=>console.log('connected to mongodb !'))
+// mongoose_1.default.connect('mongodb://localhost/datadb').then(res => console.log('connected to mongodb !'));
 app.use(logger);
 app.use(body_parser_1.default.json());
 app.use('/users', users_1.default);
